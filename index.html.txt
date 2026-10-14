@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Il mondo delle fabe — Cuentos mágicos personalizados</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#182941;--cream:#fcf7ed;--gold:#e6ad55;--coral:#d76d5a;--line:#e7decf}
+  body{font-family:"DM Sans",sans-serif;color:var(--ink);background:var(--cream)}
+  h1,h2,h3,.brand{font-family:"Fraunces",serif}
+  .soft-card{background:#fffdf8;border:1px solid var(--line);border-radius:26px;box-shadow:0 12px 36px #24324b0d}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:48px;padding:.75rem 1.3rem;border-radius:999px;font-weight:700;transition:transform .2s,box-shadow .2s;cursor:pointer;border:none}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px #172b4326}
+  .btn-primary{background:var(--coral);color:white}
+  .btn-outline{border:1px solid #a9a29a;background:#fffdf8;color:var(--ink)}
+  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  .field{width:100%;border:1px solid #b9b3a9;border-radius:14px;background:white;padding:12px 15px;min-height:48px}
+  .field:focus{outline:3px solid #e6ad5580;border-color:#8c622f}
+  .image-frame{overflow:hidden;border-radius:22px;background:#ede6d7}
+  .image-frame img{width:100%;height:100%;object-fit:cover}
+  .night{background:#172b43;color:#fff9eb}
+  .style-acuarela{filter:saturate(.8) contrast(.85) brightness(1.08)}
+  .style-comic{filter:saturate(1.6) contrast(1.3)}
+  .style-pastel{filter:saturate(.6) brightness(1.15) sepia(.15)}
+  .style-pixar{filter:saturate(1.3) contrast(1.1) brightness(1.05) blur(.3px)}
+  .style-anime{filter:saturate(1.5) contrast(1.15) hue-rotate(-5deg)}
+  .style-lapiz{filter:grayscale(1) contrast(1.4) brightness(1.1)}
+  .chip{display:inline-block;padding:.5rem .9rem;border-radius:999px;background:white;font-size:14px;border:1px solid var(--line)}
+  .avatar-placeholder{background:radial-gradient(circle at 50% 35%,#ffe9ae 0 19%,#e8b377 20% 23%,transparent 24%),radial-gradient(ellipse at 50% 105%,#d76d5a 0 42%,transparent 43%),linear-gradient(145deg,#dce6dc,#b7cbb9)}
+  .hidden{display:none!important}
+  @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .reveal{animation:rise .6s both}
+</style>
+</head>
+<body>
+
+<header class="night">
+  <div class="mx-auto max-w-7xl px-5 py-4 flex flex-wrap items-center justify-between gap-4">
+    <a href="#inicio" class="brand flex items-center gap-2 text-xl font-semibold">
+      <span class="text-amber-300">✦</span> Il mondo delle fabe
+    </a>
+    <nav class="flex flex-wrap items-center gap-x-5 gap-y-3 text-sm">
+      <a href="#inicio" class="hover:underline">Inicio</a>
+      <a href="#libros" class="hover:underline">Libros</a>
+      <a href="#crear" class="hover:underline">Crear</a>
+      <a href="#mis-historias" class="hover:underline">Mis historias</a>
+    </nav>
+    <a href="#crear" class="btn btn-primary">Crear mi historia</a>
+  </div>
+</header>
+
+<section id="inicio" class="night py-16">
+  <div class="mx-auto max-w-7xl px-5 grid lg:grid-cols-2 gap-10 items-center">
+    <div class="reveal">
+      <p class="text-amber-300 font-bold uppercase tracking-widest mb-4 text-xs">UN MUNDO DE CUENTOS POR DESCUBRIR</p>
+      <h1 class="text-5xl font-semibold leading-tight mb-6">Convierte tus recuerdos en cuentos mágicos</h1>
+      <p class="text-lg mb-8 opacity-90">Sube una foto, elige un estilo (Pixar, Cómic, Acuarela…) y crea una historia donde tu peque es el protagonista.</p>
+      <a href="#crear" class="btn btn-primary">Empezar a crear ✦</a>
+    </div>
+    <div class="reveal">
+      <div class="image-frame h-96 rotate-2 border-8 border-[#f9e9c8] shadow-2xl">
+        <img src="https://images.pexels.com/photos/35303525/pexels-photo-35303525.jpeg" alt="Cuento mágico">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="libros" class="py-16 bg-[#f3ecdf]">
+  <div class="mx-auto max-w-7xl px-5">
+    <p class="uppercase tracking-widest font-bold mb-3 text-xs text-[#a84e3f]">LA BIBLIOTECA</p>
+    <h2 class="text-3xl font-semibold mb-3">Elige dónde empieza la magia</h2>
+    <p class="mb-9 text-[#41516a]">Cuatro universos para grandes aventuras en familia.</p>
+    <div class="grid md:grid-cols-3 gap-6" id="book-grid"></div>
+  </div>
+</section>
+
+<section id="crear" class="mx-auto max-w-7xl px-5 py-16">
+  <p class="uppercase tracking-widest font-bold mb-3 text-xs text-[#a84e3f]">TU TALLER DE CUENTOS</p>
+  <h2 class="text-3xl font-semibold mb-3">Haz que la historia sea vuestra</h2>
+  <p class="mb-9 text-[#41516a]">Sube foto, elige estilo, personaliza personajes y descarga tu cuento.</p>
+
+  <div class="grid lg:grid-cols-2 gap-7">
+    <section class="soft-card p-6 sm:p-8">
+      <h3 class="text-xl font-semibold mb-3">1. Imagina a tu protagonista</h3>
+      <p class="mb-4 text-[#41516a] text-sm">Foto JPG/PNG/WebP hasta 5MB. O usa el avatar de ejemplo.</p>
+
+      <div class="flex items-start gap-3 mb-5">
+        <input id="photo-consent" type="checkbox" class="mt-1 h-5 w-5">
+        <label for="photo-consent" class="text-sm">Tengo permiso para usar esta imagen. Si es un menor, cuento con consentimiento de su tutor legal.</label>
+      </div>
+
+      <label class="font-bold block mb-2 text-sm" for="photo-input">Elige una foto</label>
+      <input id="photo-input" type="file" accept="image/jpeg,image/png,image/webp" class="field mb-3">
+
+      <button id="avatar-session" type="button" class="btn btn-outline mb-5 w-full">Avatar sin foto</button>
+
+      <label class="font-bold block mb-2 text-sm" for="style-select">Estilo de caricatura</label>
+      <select id="style-select" class="field mb-5">
+        <option value="acuarela">Acuarela</option>
+        <option value="comic">Cómic</option>
+        <option value="pastel">Pastel</option>
+        <option value="pixar" selected>Pixar 3D</option>
+        <option value="anime">Anime</option>
+        <option value="lapiz">Lápiz de color</option>
+      </select>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <p class="font-semibold mb-2 text-sm">Imagen original</p>
+          <div class="image-frame h-44 sm:h-56">
+            <img id="original-preview" src="https://images.pexels.com/photos/25025732/pexels-photo-25025732.jpeg" alt="Original">
+          </div>
+        </div>
+        <div>
+          <p class="font-semibold mb-2 text-sm">Vista previa artística</p>
+          <div id="avatar-preview" class="image-frame avatar-placeholder style-pixar h-44 sm:h-56 relative">
+            <img id="avatar-photo" class="hidden absolute inset-0 w-full h-full object-cover" alt="Vista previa">
+          </div>
+        </div>
+      </div>
+
+      <p class="mt-4 text-xs text-[#41516a]">Fase 1: efecto CSS local. Fase 2: conversión IA real con Replicate.</p>
+      <p id="photo-status" class="mt-3 font-semibold text-sm"></p>
+    </section>
+
+    <section class="soft-card p-6 sm:p-8">
+      <h3 class="text-xl font-semibold mb-5">2. Pon nombre a la aventura</h3>
+      <form id="story-form" class="space-y-4">
+        <div>
+          <label class="font-bold block mb-2 text-sm" for="story-select">Elige una historia</label>
+          <select id="story-select" class="field"></select>
+        </div>
+        <div>
+          <label class="font-bold block mb-2 text-sm" for="protagonist">Nombre del protagonista</label>
+          <input id="protagonist" class="field" maxlength="35" required value="Alex">
+        </div>
+        <div>
+          <label class="font-bold block mb-2 text-sm" for="companion">Nombre del segundo personaje</label>
+          <input id="companion" class="field" maxlength="35" required value="Luna">
+        </div>
+        <div>
+          <label class="font-bold block mb-2 text-sm" for="pet">Nombre de la mascota</label>
+          <input id="pet" class="field" maxlength="35" required value="Nube">
+        </div>
+
+        <div class="rounded-2xl bg-[#f6efe2] p-4">
+          <p class="font-bold mb-3 text-sm">Tus personajes</p>
+          <div class="flex flex-wrap gap-2">
+            <span id="chip-protagonist" class="chip"></span>
+            <span id="chip-companion" class="chip"></span>
+            <span id="chip-pet" class="chip"></span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-full">Generar mi cuento ✦</button>
+      </form>
+    </section>
+  </div>
+</section>
+
+<section id="resultado" class="py-16 bg-[#f3ecdf] hidden">
+  <div class="mx-auto max-w-6xl px-5">
+    <h2 class="text-3xl font-semibold mb-7">¡Tu cuento está listo!</h2>
+    <div class="grid md:grid-cols-[minmax(0,360px)_1fr] gap-7 items-stretch">
+      <div class="soft-card p-4">
+        <div class="image-frame h-64">
+          <img id="result-cover" src="https://images.pexels.com/photos/35303525/pexels-photo-35303525.jpeg" alt="Portada">
+        </div>
+        <div id="result-avatar" class="avatar-placeholder style-pixar w-20 h-20 rounded-full border-4 border-white shadow-lg -mt-11 relative ml-5 overflow-hidden">
+          <img id="result-photo" class="hidden w-full h-full object-cover" alt="Protagonista">
+        </div>
+        <h3 id="result-book-title" class="px-4 mt-3 font-semibold text-lg"></h3>
+        <p id="result-book-name" class="px-4 pb-4 mt-2 text-sm text-[#41516a]"></p>
+      </div>
+      <div class="soft-card p-6 sm:p-9 flex flex-col">
+        <p class="uppercase tracking-widest font-bold mb-4 text-xs text-[#a84e3f]">ÉRASE UNA VEZ…</p>
+        <div id="story-text" class="leading-loose space-y-4 flex-1"></div>
+        <div class="flex flex-wrap gap-3 mt-7">
+          <button id="download-pdf" class="btn btn-outline">📥 Descargar PDF</button>
+          <button id="print-story" class="btn btn-outline">🖨️ Imprimir</button>
+          <button id="edit-button" class="btn btn-outline">✏️ Editar</button>
+          <button id="save-button" class="btn btn-primary">💾 Guardar</button>
+        </div>
+        <p id="save-status" class="mt-4 font-semibold text-sm"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="mis-historias" class="mx-auto max-w-7xl px-5 py-16">
+  <p class="uppercase tracking-widest font-bold mb-3 text-xs text-[#a84e3f]">PARA VOLVER A SOÑAR</p>
+  <h2 class="text-3xl font-semibold mb-3">Mis historias</h2>
+  <p class="mb-8 text-[#41516a]">Tus aventuras guardadas en este navegador.</p>
+  <div id="saved-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+  <p id="saved-count" class="mt-6 text-sm text-[#49566a]"></p>
+</section>
+
+<footer class="night py-8">
+  <div class="max-w-7xl mx-auto px-5 flex flex-wrap justify-between gap-3 text-sm">
+    <p>✦ Il mondo delle fabe</p>
+    <p>Un rincón para imaginar juntos.</p>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+
+  const STORIES = {
+    forest: { title:"La aventura en el bosque", emoji:"🌲", img:"https://images.pexels.com/photos/35303525/pexels-photo-35303525.jpeg", lines:[
+      (a,b,c)=>`Al amanecer, ${a} descubrió una puerta diminuta entre las raíces de un roble. ${b} y ${c} se acercaron para escuchar una canción que salía del otro lado.`,
+      (a,b,c)=>`Juntos siguieron un sendero de luciérnagas. Cuando el bosque les pidió ayuda para encontrar su estrella perdida, ${c} olfateó el camino y ${b} iluminó las ramas con una linterna.`,
+      (a,b,c)=>`Fue ${a} quien encontró la estrella bajo una hoja dorada. Desde entonces, cada vez que el viento susurra, los tres recuerdan que la magia empieza al cuidarse unos a otros.`
+    ]},
+    stars: { title:"El viaje a las estrellas", emoji:"🚀", img:"https://images.pexels.com/photos/7476135/pexels-photo-7476135.jpeg", lines:[
+      (a,b,c)=>`Una noche, ${a}, ${b} y ${c} construyeron una nave de cartón y sueños. Al cerrarse las ventanas, una chispa de luz los invitó a viajar por el cielo.`,
+      (a,b,c)=>`Atravesaron un río de cometas y conocieron a una estrella que había olvidado cómo brillar. ${b} contó un chiste, ${c} dio un salto y ${a} le ofreció una palabra amable.`,
+      (a,b,c)=>`La estrella volvió a encenderse. Los tres regresaron a casa con un secreto: incluso el universo se ilumina cuando compartimos alegría.`
+    ]},
+    animals: { title:"El reino de los animales", emoji:"🦁", img:"https://images.pexels.com/photos/5624377/pexels-photo-5624377.jpeg", lines:[
+      (a,b,c)=>`En el corazón de un valle escondido, ${a}, ${b} y ${c} recibieron una invitación para la gran fiesta de los animales.`,
+      (a,b,c)=>`Un zorro les mostró el camino, pero un arroyo crecido impedía pasar a los más pequeños. ${a} tuvo una idea, ${b} reunió ramas y ${c} animó a todos a colaborar.`,
+      (a,b,c)=>`Construyeron un puente y llegaron juntos a la fiesta. Aquella noche, el reino aprendió que una buena aventura siempre deja sitio para todos.`
+    ]},
+    dinosaur: { title:"Dinoaventura", emoji:"🦖", img:"https://images.pexels.com/photos/5624377/pexels-photo-5624377.jpeg", lines:[
+      (a,b,c)=>`${a} viajó en el tiempo y aterrizó en un valle lleno de helechos gigantes. Allí conoció a ${b}, un T-Rex simpático, y a ${c}, un pequeño estegosaurio.`,
+      (a,b,c)=>`Los tres rugieron juntos para llamar a los demás dinosaurios. Descubrieron que el volcán estaba a punto de despertar y había que avisar a todos.`,
+      (a,b,c)=>`Gracias a ${a}, ${b} y ${c}, todos los dinosaurios encontraron refugio. Aprendieron que hasta los más grandes necesitan amigos valientes.`
+    ]}
+  };
+
+  const STYLE_NAMES = {acuarela:"Acuarela",comic:"Cómic",pastel:"Pastel",pixar:"Pixar 3D",anime:"Anime",lapiz:"Lápiz de color"};
+
+  let selectedPhoto = null;
+  let currentDraft = null;
+  let editingId = null;
+
+  function renderBooks(){
+    const grid = $("book-grid");
+    grid.innerHTML = "";
+    Object.entries(STORIES).forEach(([id, s]) => {
+      const card = document.createElement("article");
+      card.className = "soft-card overflow-hidden flex flex-col";
+      card.innerHTML = `
+        <div class="image-frame h-52 rounded-none">
+          <img src="${s.img}" alt="${s.title}">
+        </div>
+        <div class="p-6 flex flex-col flex-1">
+          <h3 class="text-lg font-semibold mb-3">${s.emoji} ${s.title}</h3>
+          <p class="mb-6 flex-1 text-sm text-[#41516a]">Una aventura personalizada donde tú eres el héroe.</p>
+          <button class="btn btn-outline book-select" data-story="${id}">Personalizar</button>
+        </div>`;
+      grid.append(card);
+    });
+    const sel = $("story-select");
+    sel.innerHTML = "";
+    Object.entries(STORIES).forEach(([id, s]) => {
+      const opt = document.createElement("option");
+      opt.value = id; opt.textContent = `${s.emoji} ${s.title}`;
+      sel.append(opt);
+    });
+  }
+
+  const field = id => $(id).value.trim();
+  function updateChips(){
+    $("chip-protagonist").textContent = "✦ " + (field("protagonist") || "Protagonista");
+    $("chip-companion").textContent   = "✧ " + (field("companion")   || "Segundo personaje");
+    $("chip-pet").textContent         = "♡ " + (field("pet")         || "Mascota");
+  }
+
+  function setPhoto(url){
+    selectedPhoto = url;
+    if (url) {
+      $("avatar-photo").src = url;
+      $("avatar-photo").classList.remove("hidden");
+      $("result-photo").src = url;
+      $("result-photo").classList.remove("hidden");
+    } else {
+      $("avatar-photo").classList.add("hidden");
+      $("avatar-photo").removeAttribute("src");
+      $("result-photo").classList.add("hidden");
+      $("result-photo").removeAttribute("src");
+    }
+  }
+
+  function updateStyle(){
+    const style = $("style-select").value;
+    ["avatar-preview","avatar-photo","result-avatar","result-photo"].forEach(id => {
+      const el = $(id);
+      el.classList.remove("style-acuarela","style-comic","style-pastel","style-pixar","style-anime","style-lapiz");
+      el.classList.add("style-" + style);
+    });
+  }
+
+  function renderDraft(draft){
+    currentDraft = draft;
+    const s = STORIES[draft.story_id];
+    $("result-book-title").textContent = s.title;
+    $("result-book-name").textContent = `Una historia de ${draft.protagonist}, ${draft.companion} y ${draft.pet}`;
+    const box = $("story-text");
+    box.innerHTML = "";
+    s.lines.forEach(line => {
+      const p = document.createElement("p");
+      p.textContent = line(draft.protagonist, draft.companion, draft.pet);
+      box.append(p);
+    });
+    $("resultado").classList.remove("hidden");
+    $("resultado").scrollIntoView({behavior:"smooth"});
+  }
+
+  async function downloadPDF(){
+    if (!currentDraft) return;
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: "mm", format: "a5" });
+    const s = STORIES[currentDraft.story_id];
+
+    doc.setFont("helvetica","bold"); doc.setFontSize(18);
+    doc.text(s.title, 105, 25, { align: "center" });
+    doc.setFontSize(10); doc.setFont("helvetica","normal");
+    doc.text(`Una historia de ${currentDraft.protagonist}, ${currentDraft.companion} y ${currentDraft.pet}`, 105, 33, { align: "center" });
+
+    let y = 50;
+    doc.setFontSize(12);
+    s.lines.forEach(line => {
+      const text = line(currentDraft.protagonist, currentDraft.companion, currentDraft.pet);
+      const lines = doc.splitTextToSize(text, 160);
+      if (y + lines.length * 7 > 200) { doc.addPage(); y = 20; }
+      doc.text(lines, 20, y);
+      y += lines.length * 7 + 6;
+    });
+
+    doc.save(`cuento-${currentDraft.protagonist}.pdf`);
+    $("save-status").textContent = "✅ PDF descargado";
+  }
+
+  function printStory(){
+    if (!currentDraft) return;
+    const s = STORIES[currentDraft.story_id];
+    const win = window.open("", "_blank");
+    const html = `
+      <html><head><title>${s.title}</title>
+      <style>body{font-family:Georgia,serif;max-width:600px;margin:40px auto;padding:20px;line-height:1.8;color:#182941}
+      h1{text-align:center}p{margin:16px 0}</style></head><body>
+      <h1>${s.title}</h1>
+      <p style="text-align:center"><em>Una historia de ${currentDraft.protagonist}, ${currentDraft.companion} y ${currentDraft.pet}</em></p>
+      ${s.lines.map(l => `<p>${l(currentDraft.protagonist, currentDraft.companion, currentDraft.pet)}</p>`).join("")}
+      </body></html>`;
+    win.document.write(html);
+    win.document.close();
+    win.print();
+  }
+
+  const LS_KEY = "mondo_fabe_stories";
+  function loadSaved(){
+    try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); }
+    catch { return []; }
+  }
+  function persistSaved(arr){
+    localStorage.setItem(LS_KEY, JSON.stringify(arr));
+  }
+  function renderSaved(){
+    const list = $("saved-list");
+    const arr = loadSaved();
+    list.innerHTML = "";
+    if (arr.length === 0) {
+      list.innerHTML = `<p class="text-[#41516a]">Aún no hay historias guardadas. ¡Crea la primera!</p>`;
+      $("saved-count").textContent = "";
+      return;
+    }
+    arr.forEach(rec => {
+      const card = document.createElement("article");
+      card.className = "soft-card p-6";
+      card.innerHTML = `
+        <div class="text-3xl text-[#b65948] mb-3">✦</div>
+        <h3 class="font-semibold text-lg">${rec.story_title}</h3>
+        <p class="mt-2 text-sm text-[#41516a]">${rec.protagonist} · ${rec.companion} · ${rec.pet}</p>
+        <p class="mt-2 mb-5 text-xs text-[#41516a]">Estilo: ${STYLE_NAMES[rec.style] || "Pixar 3D"}</p>
+        <div class="flex flex-wrap gap-2">
+          <button class="btn btn-primary" data-action="continue" data-id="${rec.id}">Leer</button>
+          <button class="btn btn-outline" data-action="edit" data-id="${rec.id}">Editar</button>
+          <button class="btn btn-outline" data-action="delete" data-id="${rec.id}">Borrar</button>
+        </div>`;
+      list.append(card);
+    });
+    $("saved-count").textContent = `${arr.length} historia(s) guardada(s)`;
+  }
+
+  document.addEventListener("click", e => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+
+    if (btn.classList.contains("book-select")) {
+      $("story-select").value = btn.dataset.story;
+      editingId = null;
+      $("crear").scrollIntoView({behavior:"smooth"});
+    }
+    if (btn.dataset.action === "continue") {
+      const rec = loadSaved().find(r => r.id === btn.dataset.id);
+      if (rec) {
+        $("story-select").value = rec.story_id;
+        $("protagonist").value = rec.protagonist;
+        $("companion").value = rec.companion;
+        $("pet").value = rec.pet;
+        $("style-select").value = rec.style || "pixar";
+        updateChips(); updateStyle();
+        renderDraft(rec);
+      }
+    }
+    if (btn.dataset.action === "edit") {
+      const rec = loadSaved().find(r => r.id === btn.dataset.id);
+      if (rec) {
+        editingId = rec.id;
+        $("story-select").value = rec.story_id;
+        $("protagonist").value = rec.protagonist;
+        $("companion").value = rec.companion;
+        $("pet").value = rec.pet;
+        $("style-select").value = rec.style || "pixar";
+        updateChips(); updateStyle();
+        $("crear").scrollIntoView({behavior:"smooth"});
+      }
+    }
+    if (btn.dataset.action === "delete") {
+      const arr = loadSaved().filter(r => r.id !== btn.dataset.id);
+      persistSaved(arr);
+      renderSaved();
+    }
+  });
+
+  ["protagonist","companion","pet"].forEach(id => $(id).addEventListener("input", updateChips));
+  $("style-select").addEventListener("change", updateStyle);
+
+  $("photo-input").addEventListener("change", e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!$("photo-consent").checked) {
+      e.target.value = "";
+      $("photo-status").textContent = "⚠️ Marca primero la casilla de consentimiento.";
+      $("photo-status").style.color = "#9b4538";
+      return;
+    }
+    if (!["image/jpeg","image/png","image/webp"].includes(file.type) || file.size > 5*1024*1024) {
+      e.target.value = "";
+      $("photo-status").textContent = "⚠️ Elige JPG, PNG o WebP de hasta 5MB.";
+      $("photo-status").style.color = "#9b4538";
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setPhoto(reader.result);
+      $("photo-status").textContent = "✅ Foto cargada. (Fase 1: solo filtro CSS, sin IA real todavía)";
+      $("photo-status").style.color = "#285b45";
+    };
+    reader.readAsDataURL(file);
+  });
+
+  $("photo-consent").addEventListener("change", () => {
+    if (!$("photo-consent").checked && selectedPhoto) {
+      setPhoto(null);
+      $("photo-input").value = "";
+    }
+  });
+
+  $("avatar-session").addEventListener("click", () => {
+    setPhoto(null);
+    $("photo-input").value = "";
+    $("photo-status").textContent = "Avatar de ejemplo activado. Elige un estilo.";
+    $("photo-status").style.color = "#285b45";
+  });
+
+  $("story-form").addEventListener("submit", e => {
+    e.preventDefault();
+    const draft = {
+      id: editingId || ("s" + Date.now()),
+      story_id: $("story-select").value,
+      story_title: STORIES[$("story-select").value].title,
+      protagonist: field("protagonist") || "Alex",
+      companion: field("companion") || "Luna",
+      pet: field("pet") || "Nube",
+      style: $("style-select").value,
+      created_at: new Date().toISOString()
+    };
+    renderDraft(draft);
+  });
+
+  $("download-pdf").addEventListener("click", downloadPDF);
+  $("print-story").addEventListener("click", printStory);
+  $("edit-button").addEventListener("click", () => $("crear").scrollIntoView({behavior:"smooth"}));
+
+  $("save-button").addEventListener("click", () => {
+    if (!currentDraft) {
+      $("save-status").textContent = "⚠️ Genera primero el cuento.";
+      return;
+    }
+    const arr = loadSaved();
+    const idx = arr.findIndex(r => r.id === currentDraft.id);
+    if (idx >= 0) arr[idx] = currentDraft;
+    else arr.push(currentDraft);
+    persistSaved(arr);
+    renderSaved();
+    $("save-status").textContent = "✅ Guardado en Mis historias";
+    $("save-status").style.color = "#285b45";
+  });
+
+  renderBooks();
+  renderSaved();
+  updateChips();
+  updateStyle();
+})();
+</script>
+</body>
+</html>
